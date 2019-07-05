@@ -26,13 +26,6 @@ class NotePopup extends React.Component {
     isDeleteDisabled: PropTypes.bool,
   }
 
-  constructor(props) {
-    super(props);
-    this.state = { 
-      canModify: core.canModify(props.annotation)
-    };
-  }
-
   componentDidMount() {
     core.addEventListener('updateAnnotationPermission', this.onUpdateAnnotationPermission);
   }
@@ -42,9 +35,7 @@ class NotePopup extends React.Component {
   }
 
   onUpdateAnnotationPermission = () => {
-    this.setState({
-      canModify: core.canModify(this.props.annotation)
-    });
+    this.forceUpdate();
   }
 
   togglePopup = () => {
@@ -67,16 +58,15 @@ class NotePopup extends React.Component {
   }
 
   render() {
-    const { canModify } = this.state;
     const { t, isNoteExpanded, notePopupId, annotation, onDelete, isDisabled, isEditDisabled, isDeleteDisabled } = this.props;
     const isOpen = notePopupId === annotation.Id;
     const className = getClassName('modify', { isOpen });
 
-    if (!canModify || !isNoteExpanded || isDisabled) {
+    if (!core.canModify(annotation) || !isNoteExpanded || isDisabled) {
       return null;
     }
 
-    return(
+    return (
       <div className="NotePopup" data-element="notePopup" onClick={e => e.stopPropagation()}>
         <div className="overflow" onClick={this.togglePopup}>
           <Icon glyph="ic_overflow_black_24px" />

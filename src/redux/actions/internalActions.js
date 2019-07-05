@@ -44,7 +44,7 @@ export const enableElements = (dataElements, priority) => (dispatch, getState) =
 export const setActiveToolNameAndStyle = toolObject => (dispatch, getState) => {
   const state = getState();
   let name;
-  
+
   if (isIOS || isAndroid) {
     name = toolObject.name;
   } else {
@@ -102,6 +102,7 @@ export const setDocumentFile = documentFile => ({ type: 'SET_DOCUMENT_FILE', pay
 export const setDocumentType = type => ({ type: 'SET_DOCUMENT_TYPE', payload: { type }});
 export const setPDFDoc = pdfDoc => ({ type: 'SET_PDF_DOC', payload: { pdfDoc }});
 export const setFilename = filename => ({ type: 'SET_FILENAME', payload: { filename } });
+export const setExtension = extension => ({ type: 'SET_EXTENSION', payload: { extension } });
 export const setTotalPages = totalPages => ({ type: 'SET_TOTAL_PAGES', payload: { totalPages } });
 export const setOutlines = outlines => ({ type: 'SET_OUTLINES', payload: { outlines } });
 export const setCheckPasswordFunction = func => ({ type: 'SET_CHECKPASSWORD', payload: { func } });
@@ -111,6 +112,11 @@ export const setDocumentLoadingProgress = documentLoadingProgress => ({ type: 'S
 export const setWorkerLoadingProgress = workerLoadingProgress => ({ type: 'SET_WORKER_LOADING_PROGRESS', payload: { workerLoadingProgress }});
 export const resetLoadingProgress = () => ({ type: 'RESET_LOADING_PROGRESS' });
 export const setPassword = password => ({ type: 'SET_PASSWORD', payload: { password } });
+export const setCacheKey = cacheKey => ({ type: 'SET_CACHE_KEY', payload: { cacheKey } });
+
+export const setIsUploading = isUploading => ({ type: 'SET_IS_UPLOADING', payload: { isUploading } });
+export const setUploadProgress = progress => ({ type: 'SET_UPLOAD_PROGRESS', payload: { progress } });
+export const resetUploadProgress = () => setUploadProgress(0);
 
 // user
 export const setUserName = userName => ({ type: 'SET_USER_NAME', payload: { userName } });

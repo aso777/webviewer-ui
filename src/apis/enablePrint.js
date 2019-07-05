@@ -1,6 +1,25 @@
-import disablePrint from './disablePrint';
-import { PRIORITY_ONE } from 'constants/actionPriority';
+/**
+ * Enables print feature, affecting the Print button in menu overlay and shortcut to print (ctrl/cmd + p).
+ * @method WebViewer#enablePrint
+ * @example // 5.1 and after
+WebViewer(...)
+  .then(function(instance) {
+    instance.enablePrint();
+  });
+ * @example // 4.0 ~ 5.0
+var viewerElement = document.getElementById('viewer');
+var viewer = new PDFTron.WebViewer(...);
+
+viewerElement.addEventListener('ready', function() {
+  var instance = viewer.getInstance();
+  instance.enablePrint();
+});
+ */
+
 import actions from 'actions';
+import { PRIORITY_ONE } from 'constants/actionPriority';
+
+import disablePrint from './disablePrint';
 
 export default store => (enable = true) => {
   const elements = [

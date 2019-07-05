@@ -56,7 +56,7 @@ class DocumentContainer extends React.PureComponent {
     core.setViewerElement(this.document.current);
 
     const { hasPath, doesDocumentAutoLoad, document, advanced, dispatch } = this.props;
-    if (hasPath && doesDocumentAutoLoad) {
+    if ((hasPath && doesDocumentAutoLoad) || document.isOffline) {
       loadDocument({ document, advanced }, dispatch);
     }
 
@@ -65,6 +65,7 @@ class DocumentContainer extends React.PureComponent {
     }
 
     this.container.current.addEventListener('wheel', this.onWheel, { passive: false });
+    window.addEventListener('keydown', this.onKeyDown);
   }
 
   componentWillUnmount() {
@@ -74,13 +75,27 @@ class DocumentContainer extends React.PureComponent {
     }
 
     this.container.current.removeEventListener('wheel', this.onWheel, { passive: false });
+    window.removeEventListener('keydown', this.onKeyDown);
+  }
+
+  onKeyDown = e => {
+    const { currentPage, totalPages } = this.props;
+    const { scrollTop, clientHeight, scrollHeight } = this.container.current;
+    const reachedTop = scrollTop === 0;
+    const reachedBottom = Math.abs(scrollTop + clientHeight - scrollHeight) <= 1;
+
+    if ((e.key === 'ArrowUp' || e.which === 38) && reachedTop && currentPage > 1) {
+      this.pageUp();
+    } else if ((e.key === 'ArrowDown' || e.which === 40) && reachedBottom && currentPage < totalPages) {
+      this.pageDown();
+    }
   }
 
   handleWindowResize = () => {
     handleWindowResize(this.props, this.container.current);
   }
 
-  onWheel = e => {    
+  onWheel = e => {
     if (e.metaKey || e.ctrlKey) {
       e.preventDefault();
       this.wheelToZoom(e);
@@ -93,27 +108,25 @@ class DocumentContainer extends React.PureComponent {
     const { currentPage, totalPages } = this.props;
     const { scrollTop, scrollHeight, clientHeight } = this.container.current;
     const reachedTop = scrollTop === 0;
-    // we have 1 instead of just checking scrollTop + clientHeight === scrollHeight is because
-    // for some screens it has ~1 pixels off
     const reachedBottom = Math.abs(scrollTop + clientHeight - scrollHeight) <= 1;
 
     if (e.deltaY < 0 && reachedTop && currentPage > 1) {
-      this.navigatePagesUp();
+      this.pageUp();
     } else if (e.deltaY > 0 && reachedBottom && currentPage < totalPages) {
-      this.navigatePagesDown();
+      this.pageDown();
     }
   }
 
-  navigatePagesUp = () => {
+  pageUp = () => {
     const { currentPage, displayMode } = this.props;
     const { scrollHeight, clientHeight } = this.container.current;
     const newPage = currentPage - getNumberOfPagesToNavigate(displayMode);
 
     core.setCurrentPage(Math.max(newPage, 1));
-    this.container.current.scrollTop = scrollHeight - clientHeight;    
+    this.container.current.scrollTop = scrollHeight - clientHeight;
   }
 
-  navigatePagesDown = () => {
+  pageDown = () => {
     const { currentPage, displayMode, totalPages } = this.props;
     const newPage = currentPage + getNumberOfPagesToNavigate(displayMode);
 
@@ -142,7 +155,7 @@ class DocumentContainer extends React.PureComponent {
 
   getClassName = props => {
     const { isLeftPanelOpen, isRightPanelOpen, isHeaderOpen, isSearchOverlayOpen } = props;
-    
+
     return [
       'DocumentContainer',
       isLeftPanelOpen ? 'left-panel' : '',
@@ -156,12 +169,12 @@ class DocumentContainer extends React.PureComponent {
     let className;
 
     if (isIE) {
-      className = getClassNameInIE(this.props);  
+      className = getClassNameInIE(this.props);
     } else {
       className = this.getClassName(this.props);
     }
 
-    return(
+    return (
       <div className={className} ref={this.container} data-element="documentContainer" onTransitionEnd={this.onTransitionEnd}>
         <div className="document" ref={this.document}></div>
       </div>
@@ -187,7 +200,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   dispatch,
-  openElement: dataElement => dispatch(actions.openElement(dataElement)) 
+  openElement: dataElement => dispatch(actions.openElement(dataElement))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DocumentContainer);

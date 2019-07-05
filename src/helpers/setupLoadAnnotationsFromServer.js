@@ -1,5 +1,5 @@
 import core from 'core';
-import { documentTypes } from 'constants/types';
+import { workerTypes } from 'constants/types';
 
 export default store =>  {
   const state = store.getState();
@@ -32,7 +32,7 @@ export default store =>  {
       data: docIdQuery,
       headers: serverUrlHeaders,
       success: data => {
-        if (!_.isNull(data) && !_.isUndefined(data)) {
+        if (data !== null && data !== undefined) {
           window.readerControl.loadedFromServer = true;
           callback(data);
         } else {
@@ -54,7 +54,7 @@ export default store =>  {
     getAnnotsFromServer(origData, callback);
   });
   core.addEventListener('documentLoaded', function() {
-    if (window.docViewer.getDocument().getType() === documentTypes.OFFICE) {
+    if (window.docViewer.getDocument().getType() === workerTypes.OFFICE) {
       getAnnotsFromServer(null, function(data) {
         window.docViewer.getAnnotationManager().importAnnotationsAsync(data);
       });

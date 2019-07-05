@@ -13,8 +13,14 @@ export default store => e => {
   const state = getState();
   const selectedTextFromCanvas = core.getSelectedText();
   const selectedTextFromDOM = window.getSelection().toString();
-
   if (e.metaKey || e.ctrlKey) {
+    if (e.key === 'z' || e.which === 90) {
+      if (e.shiftKey) {
+        window.docViewer.getAnnotationHistoryManager().redo();
+      } else {
+        window.docViewer.getAnnotationHistoryManager().undo();
+      }
+    }
     if (e.shiftKey) {
       if (e.key === '+' || e.key === '=' || e.key === 'Add' || e.which === 187) { // (Ctrl/Cmd + Shift + +)
         e.preventDefault();
@@ -80,7 +86,7 @@ export default store => e => {
     } else if (e.key === 'Escape' || e.which === 27) { // (Esc)
       e.preventDefault();
       setToolModeAndGroup(dispatch, 'AnnotationEdit', '');
-      dispatch(actions.closeElements(['annotationPopup', 'textPopup', 'contextMenuPopup', 'toolStylePopup', 'annotationStylePopup', 'signatureModal', 'printModal', 'searchOverlay' ]));
+      dispatch(actions.closeElements([ 'annotationPopup', 'textPopup', 'contextMenuPopup', 'toolStylePopup', 'annotationStylePopup', 'signatureModal', 'printModal', 'searchOverlay' ]));
     } else if (!selectedTextFromCanvas) {
       if (document.activeElement instanceof window.HTMLInputElement || document.activeElement instanceof window.HTMLTextAreaElement) {
         return;
